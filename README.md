@@ -1,21 +1,14 @@
 
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4060151.svg)](https://doi.org/10.5281/zenodo.4060151)
 
 
-# EEG_classification
-Description of the approach : https://towardsdatascience.com/sleep-stage-classification-from-single-channel-eeg-using-convolutional-neural-networks-5c710d92d38e
+# EEG_classification_1D_CNN
 
 
 Sleep Stage Classification from Single Channel EEG using Convolutional Neural
 Networks
 
 *****
-
-<span class="figcaption_hack">Photo by [Paul
-M](https://unsplash.com/photos/7i9yLoUgoP8?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText)
-on
-[Unsplash](https://unsplash.com/search/photos/owl?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText)</span>
 
 Quality Sleep is an important part of a healthy lifestyle as lack of it can
 cause a list of
@@ -39,16 +32,6 @@ label [{“W”, “N1”, “N2”, “N3”,
 
 <span class="figcaption_hack">Fig 2 : Sleep stages through the night</span>
 
-This post is based on a publicly available EEG Sleep data (
-[Sleep-EDF](https://www.physionet.org/physiobank/database/sleep-edfx/) ) that
-was done on 20 subject, 19 of which have 2 full nights of sleep. We use the
-pre-processing scripts available in this
-[repo](https://github.com/akaraspt/deepsleepnet) and split the train/test so
-that no study subject is in both at the same time.
-
-The general objective is to go from a 1D sequence like in fig 1 and predict the
-output hypnogram like in fig 2.
-
 ### Model Description
 
 Recent approaches [[1]](https://arxiv.org/pdf/1703.04046.pdf) use a sub-model
@@ -56,9 +39,7 @@ that encodes each epoch into a 1D vector of fixed size and then a second
 sequential sub-model that maps each epoch’s vector into a class from [{“W”,
 “N1”, “N2”, “N3”, “REM”}](https://en.wikipedia.org/wiki/Sleep_cycle).
 
-Here we use a 1D CNN to encode each Epoch and then another 1D CNN or LSTM that
-labels the sequence of epochs to create the final
-[hypnogram](https://en.wikipedia.org/wiki/Hypnogram). This allows the prediction
+Here we use a 1D CNN to encode each Epoch and then another 1D CNN or LSTM that. This allows the prediction
 for an epoch to take into account the context.
 
 <span class="figcaption_hack">Sub-model 1 : Epoch encoder</span>
@@ -78,54 +59,3 @@ models and show that it can improve the performance.
 The full model is trained end-to-end from scratch using Adam optimizer with an
 initial learning rate of 1e⁻³ that is reduced each time the validation accuracy
 plateaus using the ReduceLROnPlateau Keras Callbacks.
-
-<span class="figcaption_hack">Accuracy Training curves</span>
-
-### Results
-
-We compare 3 different models :
-
-* CNN-CNN : This ones used a 1D CNN for the epoch encoding and then another 1D CNN
-for the sequence labeling.
-* CNN-CNN-CRF : This model used a 1D CNN for the epoch encoding and then a 1D
-CNN-CRF for the sequence labeling.
-* CNN-LSTM : This ones used a 1D CNN for the epoch encoding and then an LSTM for
-the sequence labeling.
-
-We evaluate each model on an independent test set and get the following results
-:
-
-* CNN-CNN : F1 = 0.81, ACCURACY = 0.87
-* CNN-CNN-CRF : F1 = 0.82, ACCURACY =0.89
-* CNN-LSTM : F1 = 0.71, ACCURACY = 0.76
-
-The CNN-CNN-CRF outperforms the two other models because the CRF helps learn the
-transition probabilities between classes. The LSTM based model does not work as
-well because it is most sensitive to hyper-parameters like the optimizer and the
-batch size and requires extensive tuning to perform well.
-
-<span class="figcaption_hack">Ground Truth Hypnogram</span>
-
-<span class="figcaption_hack">Predicted Hypnogram using CNN-CNN-CRF</span>
-
-Source code available here :
-[https://github.com/CVxTz/EEG_classification](https://github.com/CVxTz/EEG_classification)
-
-I look forward to your suggestions and feedback.
-
-[[1] DeepSleepNet: a Model for Automatic Sleep Stage Scoring based on Raw
-Single-Channel EEG](https://arxiv.org/pdf/1703.04046.pdf)
-
-How to cite:
-```
-@software{mansar_youness_2020_4060151,
-  author       = {Mansar Youness},
-  title        = {CVxTz/EEG\_classification: v1.0},
-  month        = sep,
-  year         = 2020,
-  publisher    = {Zenodo},
-  version      = {v1.0},
-  doi          = {10.5281/zenodo.4060151},
-  url          = {https://doi.org/10.5281/zenodo.4060151}
-}
-```
